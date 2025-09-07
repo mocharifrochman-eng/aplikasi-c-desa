@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi C Desa Sengonwetan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar {
+            background-color: #2c786c;
+        }
+        .sidebar {
+            background-color: #004445;
+            color: white;
+            min-height: 100vh;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+        .sidebar a:hover {
+            background-color: #2c786c;
+        }
+        .content {
+            padding: 20px;
+        }
+        .card {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+            border-radius: 10px;
+        }
+        .card-header {
+            background-color: #2c786c;
+            color: white;
+            border-radius: 10px 10px 0 0 !important;
+        }
+        .btn-primary {
+            background-color: #2c786c;
+            border-color: #2c786c;
+        }
+        .btn-primary:hover {
+            background-color: #004445;
+            border-color: #004445;
+        }
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #004445;
+        }
+        .login-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            width: 400px;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(44, 120, 108, 0.1);
+        }
+        .detail-img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 5px;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        #cameraPreview {
+            width: 100%;
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+        }
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        .preview-container {
+            display: none;
+            position: relative;
+        }
+        .btn-camera {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            z-index: 100;
+        }
+        .page-content {
+            display: none;
+        }
+        #dashboardContent {
+            display: block;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .search-filter-container {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Halaman Login -->
+    <div id="loginPage" class="login-container">
+        <div class="login-form">
+            <h2 class="text-center mb-4">Aplikasi C Desa Sengonwetan</h2>
+            <div class="text-center mb-4">
+                <img src="https://via.placeholder.com/100x100?text=Logo" alt="Logo Desa" class="img-fluid rounded-circle">
+            </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password">
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </form>
+            <div id="loginMessage" class="alert alert-danger mt-3 d-none"></div>
+        </div>
+    </div>
+
+    <!-- Halaman Utama (Dashboard) -->
+    <div id="mainPage" class="d-none">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-landmark me-2"></i>Aplikasi C Desa Sengonwetan
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" id="logoutBtn"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-2 sidebar p-0 d-none d-md-block">
+                    <div class="text-center p-4">
+                        <img src="https://via.placeholder.com/80x80?text=Logo" alt="Logo Desa" class="img-fluid rounded-circle mb-2">
+                        <h5>Desa Sengonwetan</h5>
+                    </div>
+                    <hr>
+                    <a href="#" class="sidebar-link active" data-page="dashboard"><i class="fas fa-home me-2"></i> Dashboard</a>
+                    <a href="#" class="sidebar-link" data-page="dataCDesa"><i class="fas fa-list me-2"></i> Data C Desa</a>
+                    <a href="#" class="sidebar-link" data-page="inputData"><i class="fas fa-plus-circle me-2"></i> Input Data</a>
+                    <a href="#" class="sidebar-link" data-page="statistik"><i class="fas fa-chart-bar me-2"></i> Statistik</a>
+                    <a href="#" class="sidebar-link" data-page="tentang"><i class="fas fa-info-circle me-2"></i> Tentang</a>
+                </div>
+
+                <!-- Konten Utama -->
+                <div class="col-md-10 ms-sm-auto content">
+                    <!-- Dashboard -->
+                    <div id="dashboardContent" class="page-content">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Dashboard</h1>
+                            <button class="btn btn-sm btn-primary" id="refreshDashboard">
+                                <i class="fas fa-sync-alt me-1"></i> Refresh
+                            </button>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card text-white bg-primary mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Jumlah Data C Desa</h5>
+                                        <p class="card-text display-4" id="totalData">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-white bg-success mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Total Luas Tanah</h5>
+                                        <p class="card-text display-4" id="totalLuas">0 Ha</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-white bg-info mb-3">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Jumlah Persil</h5>
+                                        <p class="card-text display-4" id="totalPersil">0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pencarian dan Filter untuk Data Terbaru -->
+                        <div class="search-filter-container mb-4">
+                            <h5 class="mb-3">Pencarian Data Terbaru</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="Cari data..." id="dashboardSearchInput">
+                                        <button class="btn btn-primary" type="button" id="dashboardSearchButton">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="dashboardFilterPersil">
+                                        <option value="">Semua Persil</option>
+                                        <option value="A">Persil A</option>
+                                        <option value="B">Persil B</option>
+                                        <option value="C">Persil C</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="dashboardFilterSort">
+                                        <option value="newest">Terbaru</option>
+                                        <option value="oldest">Terlama</option>
+                                        <option value="largest">Luas Terbesar</option>
+                                        <option value="smallest">Luas Terkecil</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Data Terbaru</h5>
+                                <button class="btn btn-sm btn-success" id="exportDashboardPdf">
+                                    <i class="fas fa-file-pdf me-1"></i> Export PDF
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>No. C Desa</th>
+                                                <th>Nama</th>
+                                                <th>Persil</th>
+                                                <th>Luas (m²)</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dashboardTableBody">
+                                            <!-- Data akan diisi oleh JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Data C Desa -->
+                    <div id="dataCDesaContent" class="page-content">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Data C Desa</h1>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="input-group mb-3">
+                                            <input type="text" class="form-control" placeholder="Cari data..." id="searchInput">
+                                            <button class="btn btn-primary" type="button" id="searchButton">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select class="form-select" id="filterPersil">
+                                            <option value="">Semua Persil</option>
+                                            <option value="A">Persil A</option>
+                                            <option value="B">Persil B</option>
+                                            <option value="C">Persil C</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select class="form-select" id="filterSort">
+                                            <option value="newest">Terbaru</option>
+                                            <option value="oldest">Terlama</option>
+                                            <option value="largest">Luas Terbesar</option>
+                                            <option value="smallest">Luas Terkecil</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Daftar C Desa</h5>
+                                <div>
+                                    <button class="btn btn-sm btn-success me-2" id="exportPdf">
+                                        <i class="fas fa-file-pdf me-1"></i> Export PDF
+                                    </button>
+                                    <button class="btn btn-sm btn-primary" id="refreshData">
+                                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>No.</th>
+                                                <th>No. C Desa</th>
+                                                <th>Nama</th>
+                                                <th>Persil</th>
+                                                <th>Luas (m²)</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="dataTableBody">
+                                            <!-- Data akan diisi oleh JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination" id="pagination">
+                                        <!-- Pagination akan diisi oleh JavaScript -->
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detail Data -->
+                    <div id="detailContent" class="page-content">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Detail Data C Desa</h1>
+                            <button class="btn btn-secondary" id="backToList">
+                                <i class="fas fa-arrow-left me-1"></i> Kembali
+                            </button>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Informasi Lengkap</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <table class="table table-bordered" id="detailTable">
+                                            <!-- Data akan diisi oleh JavaScript -->
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Scan C Desa</h6>
+                                        <div class="text-center">
+                                            <img id="detailScan" src="https://via.placeholder.com/400x500?text=Scan+C+Desa" alt="Scan C Desa" class="detail-img">
+                                        </div>
+                                        <div class="text-center mt-3">
+                                            <button class="btn btn-primary" id="downloadPdf">
+                                                <i class="fas fa-download me-1"></i> Download PDF
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Data -->
+                    <div id="inputDataContent" class="page-content">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Input Data C Desa</h1>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Form Input Data</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="inputForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="inputNoCDesa" class="form-label">No. C Desa <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputNoCDesa" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="inputNama" class="form-label">Nama Pemilik <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputNama" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="inputPersil" class="form-label">Persil <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputPersil" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="inputLuas" class="form-label">Luas (m²) <span class="text-danger">*</span></label>
+                                                <input type="number" class="form-control" id="inputLuas" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="inputAlamat" class="form-label">Alamat Lengkap</label>
+                                                <textarea class="form-control" id="inputAlamat" rows="3"></textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="inputKeterangan" class="form-label">Keterangan Tambahan</label>
+                                                <textarea class="form-control" id="inputKeterangan" rows="2"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Upload Scan C Desa <span class="text-danger">*</span></label>
+                                                <div class="d-flex flex-column gap-2">
+                                                    <div class="camera-container mb-3">
+                                                        <video id="cameraPreview" autoplay playsinline></video>
+                                                        <div class="camera-overlay" id="startCamera">
+                                                            <i class="fas fa-camera"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="preview-container" id="photoPreviewContainer">
+                                                        <img id="photoPreview" class="img-fluid rounded">
+                                                        <button type="button" class="btn btn-danger btn-sm btn-camera" id="retakePhoto">
+                                                            <i class="fas fa-redo"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="d-flex gap-2">
+                                                        <input type="file" class="form-control" id="scanCDesa" accept="image/*,.pdf">
+                                                        <button type="button" class="btn btn-outline-primary" id="openCamera">
+                                                            <i class="fas fa-camera me-1"></i> Kamera
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="form-text">Anda dapat mengambil foto langsung menggunakan kamera atau mengupload file (PDF/Gambar)</div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label for="inputTanggal" class="form-label">Tanggal Input</label>
+                                                <input type="date" class="form-control" id="inputTanggal">
+                                            </div>
+                                            
+                                            <div class="mb-3 form-check">
+                                                <input type="checkbox" class="form-check-input" id="confirmData" required>
+                                                <label class="form-check-label" for="confirmData">Saya menyatakan bahwa data yang diinput adalah benar dan valid</label>
+                                            </div>
+                                            
+                                            <div class="mt-4 text-center">
+                                                <button type="reset" class="btn btn-secondary me-2">
+                                                    <i class="fas fa-times me-2"></i> Batal
+                                                </button>
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fas fa-save me-2"></i> Simpan Data
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Petunjuk Pengisian</h5>
+                            </div>
+                            <div class="card-body">
+                                <ol>
+                                    <li>Isi semua field yang ditandai dengan <span class="text-danger">*</span> (wajib diisi)</li>
+                                    <li>Pastikan data yang dimasukkan sesuai dengan dokumen fisik C Desa</li>
+                                    <li>Untuk scan C Desa, pastikan dokumen terbaca dengan jelas</li>
+                                    <li>Klik tombol "Simpan Data" setelah semua data terisi dengan benar</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistik -->
+                    <div id="statistikContent" class="page-content">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Statistik Data C Desa</h1>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Distribusi Persil</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="persilChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Luas Tanah per Kategori</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="luasChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tentang -->
+                    <div id="tentangContent" class="page-content">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2">Tentang Aplikasi</h1>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Aplikasi C Desa Sengonwetan</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 text-center">
+                                        <img src="https://via.placeholder.com/200x200?text=Logo" alt="Logo Desa" class="img-fluid rounded-circle mb-3">
+                                        <h5>Desa Sengonwetan</h5>
+                                        <p>Kecamatan Kradenan<br>Kabupaten Grobogan</p>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>Deskripsi Aplikasi</h5>
+                                        <p>Aplikasi C Desa Sengonwetan adalah sistem informasi untuk mengelola data tanah dan persil di Desa Sengonwetan. Aplikasi ini memudahkan administrasi data kepemilikan tanah dan pencatatan data C Desa.</p>
+                                        
+                                        <h5>Fitur Utama</h5>
+                                        <ul>
+                                            <li>Pencatatan data C Desa</li>
+                                            <li>Pencarian dan filter data</li>
+                                            <li>Input data dengan scan dokumen</li>
+                                            <li>Export data ke PDF</li>
+                                            <li>Statistik data persil dan luas tanah</li>
+                                        </ul>
+                                        
+                                        <h5>Kontak</h5>
+                                        <p>Untuk informasi lebih lanjut, hubungi Kantor Desa Sengonwetan.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Success -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="fas fa-check-circle me-2"></i> Sukses</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Data C Desa berhasil disimpan!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="viewDataButton">Lihat Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifikasi -->
+    <div class="toast-container">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">Notifikasi</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                <!-- Pesan toast akan diisi oleh JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Inisialisasi data
+            let cDesaData = JSON.parse(localStorage.getItem('cDesaData')) || [];
+            
+            // Inisialisasi toast
+            const toastLiveExample = document.getElementById('liveToast');
+            const toast = new bootstrap.Toast(toastLiveExample);
+            
+            // Tampilkan notifikasi toast
+            function showToast(message) {
+                $('#toastMessage').text(message);
+                toast.show();
+            }
+            
+            // Update dashboard stats
+            function updateDashboardStats() {
+                const totalData = cDesaData.length;
+                const totalLuas = cDesaData.reduce((sum, item) => sum + parseInt(item.luas || 0), 0);
+                const totalPersil = new Set(cDesaData.map(item => item.persil)).size;
+                
+                $('#totalData').text(totalData);
+                $('#totalLuas').text((totalLuas / 10000).toFixed(1) + ' Ha');
+                $('#totalPersil').text(totalPersil);
+            }
+            
+            // Update data table
+            function updateDataTable(data = cDesaData) {
+                const tableBody = $('#dataTableBody');
+                tableBody.empty();
+                
+                if (data.length === 0) {
+                    tableBody.append(`
+                        <tr>
+                            <td colspan="6" class="text-center">Tidak ada data yang ditampilkan</td>
+                        </tr>
+                    `);
+                    return;
+                }
+                
+                data.forEach((item, index) => {
+                    tableBody.append(`
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${item.noCDesa}</td>
+                            <td><a href="#" class="view-detail" data-id="${item.id}">${item.nama}</a></td>
+                            <td>${item.persil}</td>
+                            <td>${item.luas}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info view-detail" data-id="${item.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+            
+            // Update dashboard table
+            function updateDashboardTable(data = cDesaData) {
+                const dashboardTableBody = $('#dashboardTableBody');
+                dashboardTableBody.empty();
+                
+                if (data.length === 0) {
+                    dashboardTableBody.append(`
+                        <tr>
+                            <td colspan="5" class="text-center">Tidak ada data yang ditampilkan</td>
+                        </tr>
+                    `);
+                    return;
+                }
+                
+                // Ambil 5 data terbaru untuk dashboard
+                const recentData = data.slice(-5).reverse();
+                recentData.forEach(item => {
+                    dashboardTableBody.append(`
+                        <tr>
+                            <td>${item.noCDesa}</td>
+                            <td><a href="#" class="view-detail" data-id="${item.id}">${item.nama}</a></td>
+                            <td>${item.persil}</td>
+                            <td>${item.luas}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info view-detail" data-id="${item.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+            
+            // Handle Login
+            $('#loginForm').on('submit', function(e) {
+                e.preventDefault();
+                const username = $('#username').val();
+                const password = $('#password').val();
+                
+                if (username === 'admin' && password === '') {
+                    $('#loginPage').addClass('d-none');
+                    $('#mainPage').removeClass('d-none');
+                    showPage('dashboard');
+                    updateDashboardStats();
+                    updateDashboardTable();
+                    updateDataTable();
+                } else if (username === 'sengon' && password === 'sengon') {
+                    $('#loginPage').addClass('d-none');
+                    $('#mainPage').removeClass('d-none');
+                    showPage('inputData');
+                } else {
+                    $('#loginMessage').text('Username atau password salah').removeClass('d-none');
+                    setTimeout(() => {
+                        $('#loginMessage').addClass('d-none');
+                    }, 3000);
+                }
+            });
+            
+            // Handle Logout
+            $('#logoutBtn').on('click', function() {
+                $('#mainPage').addClass('d-none');
+                $('#loginPage').removeClass('d-none');
+                $('#username').val('');
+                $('#password').val('');
+            });
+            
+            // Navigasi Menu
+            $('.sidebar-link').on('click', function(e) {
+                e.preventDefault();
+                const targetPage = $(this).data('page');
+                
+                // Update menu aktif
+                $('.sidebar-link').removeClass('active');
+                $(this).addClass('active');
+                
+                showPage(targetPage);
+            });
+            
+            // Fungsi untuk menampilkan halaman
+            function showPage(pageName) {
+                // Sembunyikan semua konten
+                $('.page-content').hide();
+                
+                // Tampilkan konten yang dipilih
+                $(`#${pageName}Content`).show();
+            }
+            
+            // Handle View Detail
+            $(document).on('click', '.view-detail', function(e) {
+                e.preventDefault();
+                const id = $(this).data('id');
+                const data = cDesaData.find(item => item.id === id);
+                
+                if (data) {
+                    showDetail(data);
+                    showPage('detail');
+                }
+            });
+            
+            // Tampilkan detail data
+            function showDetail(data) {
+                const detailTable = $('#detailTable');
+                detailTable.empty();
+                
+                detailTable.append(`
+                    <tr>
+                        <th width="40%">No. C Desa</th>
+                        <td>${data.noCDesa}</td>
+                    </tr>
+                    <tr>
+                        <th>Nama</th>
+                        <td>${data.nama}</td>
+                    </tr>
+                    <tr>
+                        <th>Persil</th>
+                        <td>${data.persil}</td>
+                    </tr>
+                    <tr>
+                        <th>Luas (m²)</th>
+                        <td>${data.luas}</td>
+                    </tr>
+                    <tr>
+                        <th>Alamat</th>
+                        <td>${data.alamat || '-'}</td>
+                    </tr>
+                    <tr>
+                        <th>Tanggal Input</th>
+                        <td>${data.tanggalInput}</td>
+                    </tr>
+                `);
+                
+                // Set gambar scan jika ada
+                if (data.scanImage) {
+                    $('#detailScan').attr('src', data.scanImage);
+                }
+            }
+            
+            // Handle Back to List
+            $('#backToList').on('click', function() {
+                showPage('dataCDesa');
+            });
+            
+            // Handle Search di halaman Data C Desa
+            $('#searchButton').on('click', function() {
+                const searchTerm = $('#searchInput').val().toLowerCase();
+                const filteredData = cDesaData.filter(item => 
+                    item.nama.toLowerCase().includes(searchTerm) || 
+                    item.noCDesa.toLowerCase().includes(searchTerm) ||
+                    item.persil.toLowerCase().includes(searchTerm)
+                );
+                
+                // Update table dengan data yang difilter
+                updateDataTable(filteredData);
+            });
+            
+            // Handle Search di halaman Dashboard
+            $('#dashboardSearchButton').on('click', function() {
+                const searchTerm = $('#dashboardSearchInput').val().toLowerCase();
+                const filteredData = cDesaData.filter(item => 
+                    item.nama.toLowerCase().includes(searchTerm) || 
+                    item.noCDesa.toLowerCase().includes(searchTerm) ||
+                    item.persil.toLowerCase().includes(searchTerm)
+                );
+                
+                // Update table dengan data yang difilter
+                updateDashboardTable(filteredData);
+            });
+            
+            // Handle Refresh Data
+            $('#refreshData').on('click', function() {
+                updateDataTable();
+                showToast('Data telah diperbarui');
+            });
+            
+            // Handle Refresh Dashboard
+            $('#refreshDashboard').on('click', function() {
+                updateDashboardTable();
+                updateDashboardStats();
+                showToast('Dashboard telah diperbarui');
+            });
+            
+            // Handle Form Input
+            $('#inputForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                // Validasi sederhana
+                const noCDesa = $('#inputNoCDesa').val();
+                const nama = $('#inputNama').val();
+                const persil = $('#inputPersil').val();
+                const luas = $('#inputLuas').val();
+                
+                if (!noCDesa || !nama || !persil || !luas) {
+                    alert('Harap isi semua field yang wajib diisi!');
+                    return;
+                }
+                
+                // Simpan data
+                const newData = {
+                    id: Date.now(), // ID unik berdasarkan timestamp
+                    noCDesa: noCDesa,
+                    nama: nama,
+                    persil: persil,
+                    luas: luas,
+                    alamat: $('#inputAlamat').val(),
+                    keterangan: $('#inputKeterangan').val(),
+                    tanggalInput: $('#inputTanggal').val() || new Date().toISOString().split('T')[0],
+                    scanImage: $('#photoPreview').attr('src') || ''
+                };
+                
+                // Tambahkan ke array data
+                cDesaData.push(newData);
+                
+                // Simpan ke localStorage
+                localStorage.setItem('cDesaData', JSON.stringify(cDesaData));
+                
+                // Tampilkan modal sukses
+                $('#successModal').modal('show');
+                
+                // Reset form
+                $('#inputForm')[0].reset();
+                $('#photoPreviewContainer').hide();
+                $('.camera-container').show();
+                
+                // Update statistik dashboard
+                updateDashboardStats();
+            });
+            
+            // Handle View Data Button
+            $('#viewDataButton').on('click', function() {
+                // Update data table dengan data terbaru
+                updateDataTable();
+                updateDashboardTable();
+                
+                // Tampilkan halaman data
+                showPage('dataCDesa');
+                
+                // Update menu aktif
+                $('.sidebar-link').removeClass('active');
+                $('.sidebar-link[data-page="dataCDesa"]').addClass('active');
+                
+                showToast('Data baru telah ditambahkan');
+            });
+            
+            // Inisialisasi data table saat pertama kali dimuat
+            updateDataTable();
+            updateDashboardTable();
+            updateDashboardStats();
+        });
+    </script>
+</body>
+</html>
